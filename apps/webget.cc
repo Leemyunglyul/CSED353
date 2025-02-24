@@ -26,15 +26,13 @@ void get_URL(const string &host, const string &path) {
 
     socket.connect(dest);
 
-    string request = "GET " + path + " HTTP/1.1\r\n" +
-                     "Host: " + host + "\r\n"
-                     "Connection: close\r\n\r\n"; 
+    string request = "GET " + path + " HTTP/1.1\r\n" + "Host: " + host + "\r\nConnection: close\r\n\r\n";
 
     socket.write(request);
 
     socket.shutdown(SHUT_WR);
 
-    while(!socket.eof()){
+    while (!socket.eof()) {
         string response = socket.read();
         cout << response;
     }

@@ -23,16 +23,14 @@ size_t ByteStream::write(const string &data) {
 }
 
 //! \param[in] len bytes will be copied from the output side of the buffer
-string ByteStream::peek_output(const size_t len) const {
-    return buffer.substr(0, min(len, buffer.size()));
-}
+string ByteStream::peek_output(const size_t len) const { return buffer.substr(0, min(len, buffer.size())); }
 
 //! \param[in] len bytes will be removed from the output side of the buffer
 void ByteStream::pop_output(const size_t len) {
     size_t len_pop = min(len, buffer.size());
     buffer.erase(0, len_pop);
     _bytes_read += len_pop;
- }
+}
 
 //! Read (i.e., copy and then pop) the next "len" bytes of the stream
 //! \param[in] len bytes will be popped and returned
