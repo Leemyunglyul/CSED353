@@ -23,7 +23,7 @@ class StreamReassembler {
     size_t _output_idx;
 
     void set_eof(const string &data, const size_t index, const bool eof);
-    pair<size_t, string> truncate_string_to_output(const string &data, const size_t index);
+    pair<size_t, string> truncate_string_to_output(const string &data, const size_t index) const;
     string truncate_string_to_capacity(const string &data, const size_t index) const;
     void reassemble_storage_data();
     void insert_data(const string &data, const size_t index);

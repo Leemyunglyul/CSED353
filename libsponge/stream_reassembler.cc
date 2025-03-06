@@ -38,7 +38,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
             reassemble_storage_data();
         }
 
-        if (empty() && _output_idx == _eof_idx) {
+        if (_output_idx == _eof_idx) {
             _output.end_input();
         }
 
@@ -52,8 +52,7 @@ void StreamReassembler::set_eof(const string &data, const size_t index, const bo
         _eof_idx = index + data.size();
 }
 
-pair<size_t, string> StreamReassembler::truncate_string_to_output(const string &data, const size_t index) {
-    // data 기준 새로운 시작점 index
+pair<size_t, string> StreamReassembler::truncate_string_to_output(const string &data, const size_t index) const {
     const size_t start_idx = _output_idx > index ? _output_idx - index : 0;
 
     if (start_idx > data.size())
@@ -102,36 +101,49 @@ void StreamReassembler::reassemble_storage_data() {
 }
 
 void StreamReassembler::insert_data(const string &data, const size_t index) {
-    string _data = data;
-    size_t start_idx = index;
-    size_t end_idx = index + data.size() - 1;
+    size_t ins_start = index;
+    size_t ins_end = index + data.size();
+    string ins_data = data;
 
-    for (auto it = storage.begin(); it != storage.end();) {
-        const string cur_data = it->second;
-        const size_t cur_start_idx = it->first;
-        const size_t cur_end_idx = it->first + cur_data.size() - 1;
+    auto it = storage.begin();
+    while (it != storage.end()) {
+        size_t elem_start = it->first;
+        const string elem = it->second;
+        size_t elem_end = elem_start + elem.size();
 
-        if (start_idx > cur_end_idx || cur_start_idx > end_idx)
-            it++;
-        else if (cur_start_idx <= start_idx && end_idx <= cur_start_idx)
-            return;
-        else if (start_idx < cur_start_idx && cur_end_idx < end_idx)
-            it = storage.erase(it);
-        else {
-            if (start_idx <= cur_start_idx) {
-                _data += cur_data.substr(end_idx + 1 - cur_start_idx, cur_end_idx - end_idx);
-                end_idx = start_idx + _data.size() - 1;
-            } else {
-                start_idx = cur_start_idx;
-                _data.insert(0, cur_data.substr(0, start_idx - cur_start_idx));
-            }
-            it = storage.erase(it);
+        // Case #1: 겹치지 않는 경우
+        if (ins_end <= elem_start || ins_start >= elem_end) {
+            ++it;
+            continue;
         }
+        // Case #2: 포함되는 경우
+        if (ins_start >= elem_start && ins_end <= elem_end) {
+            return;
+        }
+
+        // Case #3: 겹치는 경우
+        size_t new_ins_start = min(ins_start, elem_start);
+        size_t new_ins_end = max(ins_end, elem_end);
+        size_t new_len = new_ins_end - new_ins_start;
+
+        string new_ins(new_len, '\0');
+
+        for (size_t i = 0; i < ins_data.size(); i++) {
+            new_ins[ins_start - new_ins_start + i] = ins_data[i];
+        }
+        for (size_t i = 0; i < elem.size(); i++) {
+            new_ins[elem_start - new_ins_start + i] = elem[i];
+        }
+
+        ins_start = new_ins_start;
+        ins_end = new_ins_end;
+        ins_data = new_ins;
+
+        it = storage.erase(it);
     }
 
-    if (!_data.empty()) {
-        storage.insert({index, truncate_string_to_capacity(_data, index)});
-    }
+    ins_data = truncate_string_to_capacity(ins_data, ins_start);
+    storage.insert({ins_start, ins_data});
 }
 
 size_t StreamReassembler::unassembled_bytes() const {
