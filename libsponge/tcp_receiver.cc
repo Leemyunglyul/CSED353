@@ -14,7 +14,8 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     const TCPHeader hdr = seg.header();
 
     if (!_syn_flag) {
-        if (!hdr.syn) return;
+        if (!hdr.syn)
+            return;
         _isn = hdr.seqno;
         _syn_flag = true;
     }
@@ -34,8 +35,8 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
 }
 
 optional<WrappingInt32> TCPReceiver::ackno() const {
-
-    if (!_syn_flag) return nullopt;
+    if (!_syn_flag)
+        return nullopt;
 
     uint64_t index = _reassembler.output_idx() + 1;
     if (_reassembler.stream_out().input_ended())

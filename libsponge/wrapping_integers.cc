@@ -13,9 +13,7 @@ using namespace std;
 //! Transform an "absolute" 64-bit sequence number (zero-indexed) into a WrappingInt32
 //! \param n The input absolute 64-bit sequence number
 //! \param isn The initial sequence number
-WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
-    return WrappingInt32(isn.raw_value() + static_cast<uint32_t> (n));
-}
+WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) { return WrappingInt32(isn.raw_value() + static_cast<uint32_t>(n)); }
 
 //! Transform a WrappingInt32 into an "absolute" 64-bit sequence number (zero-indexed)
 //! \param n The relative sequence number
@@ -34,13 +32,11 @@ uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
     const uint64_t checkpoint_mod = checkpoint - checkpoint_base;
     uint64_t result = checkpoint_base + idx;
 
-    if(checkpoint_mod > idx){
-        if(checkpoint_base != ~((1ULL << 32) - 1) && checkpoint_mod - idx > (1ULL<<31)) 
-            result += 1ULL<<32;
-    }
-    else
-        if(checkpoint_base != 0 && idx - checkpoint_mod > (1ULL<<31))
-            result -= 1ULL<<32;
+    if (checkpoint_mod > idx) {
+        if (checkpoint_base != ~((1ULL << 32) - 1) && checkpoint_mod - idx > (1ULL << 31))
+            result += 1ULL << 32;
+    } else if (checkpoint_base != 0 && idx - checkpoint_mod > (1ULL << 31))
+        result -= 1ULL << 32;
 
     return result;
 }
