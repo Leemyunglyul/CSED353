@@ -39,9 +39,8 @@ class TCPSender {
     unsigned int _retransmission_timeout;
     uint16_t _receiver_window_size{1};
     bool _fin_sent{false};
-  
+
     std::queue<TCPSegment> _outstanding_segments;
-    
 
   public:
     //! Initialize a TCPSender
