@@ -30,12 +30,13 @@ void get_URL(const string &host, const string &path) {
 
     socket.write(request);
 
-    socket.shutdown(SHUT_WR);
+    //socket.shutdown(SHUT_WR);
 
     while (!socket.eof()) {
         string response = socket.read();
         cout << response;
     }
+
 }
 
 int main(int argc, char *argv[]) {
