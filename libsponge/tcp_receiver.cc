@@ -23,6 +23,9 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     const uint64_t checkpoint = _reassembler.stream_out().bytes_written() + 1;
     const uint64_t absolute_seqno = unwrap(hdr.seqno, _isn, checkpoint);
 
+    if (absolute_seqno == 0 && !hdr.syn)
+        return;
+
     const uint64_t stream_idx = absolute_seqno - 1 + hdr.syn;
 
     _reassembler.push_substring(seg.payload().copy(), stream_idx, hdr.fin);
