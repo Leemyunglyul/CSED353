@@ -128,7 +128,7 @@ void NetworkInterface::tick(const size_t ms_since_last_tick) {
     _time_passed += ms_since_last_tick;
 
     vector<uint32_t> expired;
-    for (auto it : arp_cache) {
+    for (auto &it : arp_cache) {
         if (it.second.second <= ms_since_last_tick)
             expired.push_back(it.first);
         else
