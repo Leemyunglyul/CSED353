@@ -5,6 +5,22 @@
 
 #include <optional>
 #include <queue>
+#include <vector>
+
+struct RouteEntry {
+    const uint32_t route_prefix;
+    const uint8_t prefix_length;
+    const std::optional<Address> next_hop;
+    const size_t interface_num;
+    const uint32_t mask;
+
+    RouteEntry(uint32_t rp, uint8_t pl, std::optional<Address> nh, size_t in)
+        : route_prefix(rp)
+        , prefix_length(pl)
+        , next_hop(nh)
+        , interface_num(in)
+        , mask((pl == 0) ? 0 : ~((1U << (32 - pl)) - 1)) {}
+};
 
 //! \brief A wrapper for NetworkInterface that makes the host-side
 //! interface asynchronous: instead of returning received datagrams
@@ -48,6 +64,8 @@ class Router {
     //! as specified by the route with the longest prefix_length that matches the
     //! datagram's destination address.
     void route_one_datagram(InternetDatagram &dgram);
+
+    std::vector<RouteEntry> _routing_table{};
 
   public:
     //! Add an interface to the router
